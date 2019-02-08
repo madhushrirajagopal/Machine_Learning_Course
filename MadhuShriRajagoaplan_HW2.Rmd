@@ -1,0 +1,109 @@
+---
+title: "Homework2"
+output:
+  word_document: default
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##ANLY 530 Assignment 2
+
+Introduction to statistical learning, chapter 2, Exercise - 8 
+
+
+```{r }
+
+getwd()
+setwd("C:/Users/Madhu/Dohaa Tahha/ML1")
+getwd()
+
+```
+
+Check all the files in the working directory
+
+```{r}
+
+dir()
+
+```
+
+Read in dataset
+```{r}
+
+college =read.csv("College.csv")
+
+```
+Structure of the data 
+
+```{r}
+str(college)
+
+```
+
+
+```
+
+Separating the first row that lists the college names from the rest of the data 
+
+```{r}
+rownames(college) = college[,1]
+fix(college)
+college = college[,-1]
+fix(college)
+
+```
+
+```{r}
+summary(college)
+
+```
+
+Creating plots for the first 10 variables
+
+```{r}
+pairs(college[,1:10])
+
+```
+
+Creating box plot for the variables "Outstate" versus "Private"
+
+```{r}
+plot(college$Outstate~college$Private)
+```
+
+Creating new variable to find out how many colleges are in the elite group
+
+```{r}
+Elite = rep("NO", nrow(college))
+Elite[college$Top10perc>50]= "Yes"
+Elite = as.factor(Elite)
+college = data.frame(college,Elite)
+
+```
+
+Using Summary to see if Elite colleges ahve been created in a separate column
+
+```{r}
+summary(college)
+```
+
+Creating box plot for "Outstate" vs "Elite"
+
+```{r}
+plot(college$Outstate~college$Elite)
+
+```
+
+Plotting Histograms for variables namely "Apps", "Enroll", "Accept" , "Outstate"
+
+```{r}
+hist(college$Apps,xlim=c(0,20000))
+hist(college$Accept,xlim=c(0,10000))
+hist(college$Enroll,xlim=c(0,5000))
+hist(college$Outstate)
+
+```
