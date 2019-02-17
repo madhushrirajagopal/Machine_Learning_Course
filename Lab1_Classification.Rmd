@@ -19,14 +19,106 @@ setwd('C:/Users/Madhu/Side Projects/Machine_Learning_Course')
 
 #Read data file
 
+credit <- read.csv('credit.csv')
+
+str(credit)
+
 ```
 
-## Including Plots
+Step 2: Exploring the data
 
-You can also embed plots, for example:
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r }
+#Using sumary to check the statistics of amunt column in the dataset
+
+summary(credit$amount)
+
+str(credit$default)
+
+#Default has two levels - yes or no
+#Using table to see how many were defaulted and how many were not
+
+table(credit$default)
+
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+
+Steps to develop tree based classification
+
+
+```{r }
+#Before creating the testing and training data, randomizing the observations
+
+set.seed(12345)
+
+credit_rand <- credit[order(runif(1000)),]
+
+#checking the summary of the original data with the randomized one to notice any substantial changes 
+
+summary(credit$amount)
+summary(credit_rand$amount)
+
+```
+
+
+
+Splitting data to training and testing set 
+
+
+```{r }
+# Choosing 90% for training set and remaining 10% as the testing set
+
+credit_train <- credit_rand[1:900,]
+credit_test <- credit_rand[901:1000,]
+
+#Looking at percentage split of the testing and training to see if randomization went well
+
+prop.table(table(credit_train$default))
+prop.table(table(credit_train$default))
+
+```
+
+
+Training a model on the data
+
+
+```{r }
+
+#install.packages('C50')
+library(C50)
+# Buiding ecision tree. Since we are predicting defaulted or not, we must specify the 17th column to represent it as the class or response variable 
+
+credit_model <- C5.0(x = credit_train[-17], y = credit_train$default)
+credit_model
+
+```
+Examining the decision tree
+
+
+```{r }
+
+summary(credit_model)
+
+```
+
+As we can see, 590 were classified as class a, 166 were classified as class b . There were 125 misclassified.
+
+
+#step 4: Evaluating Model performance
+
+```{r }
+
+cred_pred <- predict(credit_model, credit_test)
+# using gmodels ro create confusion matrix
+
+#install.packages('gmodels')
+
+library(gmodels)
+
+CrossTable(credit_test$default, cred_pred, prop.chisq = FALSE, prop.c = FALSE, prop.r = FALSE, dnn = c('actual default', 'predicted default'))
+
+```
+
+As seen from the above confusion matrix, 11 were misclassified as a Type 2 error and 16 were type 1 that is it was yes but classifed as np 
