@@ -1,0 +1,32 @@
+---
+title: "Lab1_Classification"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##Lab 1_ Classification
+
+#Method 1: Tree based classification
+
+step 1: collecting data 
+
+```{r }
+getwd()
+setwd('C:/Users/Madhu/Side Projects/Machine_Learning_Course')
+
+#Read data file
+
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
