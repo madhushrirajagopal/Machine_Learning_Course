@@ -121,4 +121,76 @@ CrossTable(credit_test$default, cred_pred, prop.chisq = FALSE, prop.c = FALSE, p
 
 ```
 
-As seen from the above confusion matrix, 11 were misclassified as a Type 2 error and 16 were type 1 that is it was yes but classifed as np 
+As seen from the above confusion matrix, 11 were misclassified as a Type 2 error and 16 were type 1 that is it was yes but classifed as no.
+
+
+##Method#2: Adding Regression to trees
+
+#Step 1: Collecting data 
+
+```{r }
+# Read data 
+wine <- read.csv("whitewines.csv")
+str(wine)
+
+```
+
+
+```{r }
+# Checkimg the distribution of quality variable to see if its normal 
+hist(wine$quality)
+
+```
+
+
+Yes, the distribution seems pretty normal and we can use regression on this class variable. 
+
+Next, we explore and prepare data in step 2.
+
+```{r }
+# Creating training and testing data set 
+# 75% for tarining and 25% for testing
+
+wine_train <- wine[1:3750, ]
+wine_test <- wine[3751:4898, ]
+
+
+```
+
+Step 3, training model on data 
+
+
+```{r }
+# Installing rpart - recursive partitioning 
+
+#install.packages('rpart')
+library(rpart)
+
+m.rpart <- rpart(quality ~ ., data=wine_train)
+m.rpart
+
+#install.packages('rpart.plot')
+
+library(rpart.plot)
+
+#Visualizing the tree
+
+rpart.plot(m.rpart, digits=3)
+
+rpart.plot(m.rpart, digits=4, fallen.leaves = TRUE, type = 3, extra = 101)
+
+```
+
+The last and final step 4 of evaluating model performance
+
+```{r }
+
+p.rpart <- predict(m.rpart, wine_test)
+summary(p.rpart)
+summary(wine_test$quality)
+cor(p.rpart, wine_test$quality)
+
+```
+
+A 54% correlation is seen. 
+
