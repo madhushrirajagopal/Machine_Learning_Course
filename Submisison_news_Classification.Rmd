@@ -1,0 +1,169 @@
+---
+title: "Online news"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+#Method 1: Tree based classification
+
+step 1: collecting data 
+
+```{r }
+getwd()
+setwd('C:/Users/Madhu/Side Projects/Machine_Learning_Course')
+
+#Read data file
+
+news <- read.csv('OnlineNewsPopularity.csv')
+
+str(news)
+
+```
+
+Step 2: Exploring the data
+
+
+```{r }
+#Using sumary to check the statistics of amunt column in the dataset
+
+summary(news$shares)
+
+# Adding new variable Popularity based on the market share value. Considering the median value of 1400 to make a splut in the data as popular and unpopular 
+
+news$Popularity <- ifelse( news$shares <= 1400, "Unpopular","Popular")
+
+news$Popularity <- as.factor(news$Popularity)
+
+
+#Using table to see how many were defaulted and how many were not
+
+table(news$Popularity)
+
+```
+
+
+
+
+Steps to develop tree based classification
+
+
+```{r }
+#Before creating the testing and training data, randomizing the observations
+
+set.seed(12345)
+
+news_rand <- news[order(runif(39644)),]
+
+#checking the summary of the original data with the randomized one to notice any substantial changes 
+
+summary(news$shares)
+summary(news_rand$shares)
+
+```
+
+
+
+Splitting data to training and testing set 
+
+
+```{r }
+# Choosing 90% for training set and remaining 
+
+news_train <- news_rand[1:35679,]
+news_test <- news_rand[35680:39644,]
+
+#Looking at percentage split of the testing and training to see if randomization went well
+
+prop.table(table(news_train$Popularity))
+prop.table(table(news_test$Popularity))
+
+```
+
+
+Training a model on the data
+
+
+```{r }
+
+#install.packages('C50')
+library(C50)
+# Buiding ecision tree. Since we are predicting defaulted or not, we must specify the 17th column to represent it as the class or response variable 
+
+news_model <- C5.0(x = news_train[29:60], y = news_train$Popularity)
+news_model
+
+```
+Examining the decision tree
+
+
+```{r }
+
+summary(news_model)
+
+```
+
+As we can see, 17600 were classified as class a, 17600 were classified as class b . There were 125 misclassified.
+
+
+#step 4: Evaluating Model performance
+
+```{r }
+
+news_pred <- predict(news_model, news_test)
+# using gmodels ro create confusion matrix
+
+#install.packages('gmodels')
+
+library(gmodels)
+
+CrossTable(news_test$Popularity, news_pred, prop.chisq = FALSE, prop.c = FALSE, prop.r = FALSE, dnn = c('actual Popularity', 'predicted Popularity'))
+
+```
+
+As seen from the above confusion matrix, 11 were misclassified as a Type 2 error and 16 were type 1 that is it was yes but classifed as no.
+
+
+##Method#2: Adding Regression to trees
+
+
+
+```{r }
+# Installing rpart - recursive partitioning 
+
+#install.packages('rpart')
+library(rpart)
+
+#reg_data_train <- news_train[c(29:60,62)]
+
+m.rpart <- rpart(Popularity ~ ., data=news_train[c(29:60,62)])
+m.rpart
+
+#install.packages('rpart.plot')
+
+library(rpart.plot)
+
+#Visualizing the tree
+
+rpart.plot(m.rpart, digits=3)
+
+rpart.plot(m.rpart, digits=4, fallen.leaves = TRUE, type = 3, extra = 101)
+
+```
+
+The last and final step 4 of evaluating model performance
+
+```{r }
+
+p.rpart <- predict(m.rpart, news_test)
+summary(p.rpart)
+summary(news_test$Popularity)
+cor(p.rpart, news_test$shares)
+
+```
+
+A 54% correlation is seen. 
+
