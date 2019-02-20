@@ -1,6 +1,9 @@
 ---
 title: "Online news"
-output: html_document
+output:
+  word_document: default
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -106,7 +109,7 @@ summary(news_model)
 
 ```
 
-As we can see, 17600 were classified as class a, 17600 were classified as class b . There were 125 misclassified.
+As we can see, 11805 were classified as class a - Popular, 11538 were classified as class b - Unpopular . 
 
 
 #step 4: Evaluating Model performance
@@ -124,7 +127,7 @@ CrossTable(news_test$Popularity, news_pred, prop.chisq = FALSE, prop.c = FALSE, 
 
 ```
 
-As seen from the above confusion matrix, 11 were misclassified as a Type 2 error and 16 were type 1 that is it was yes but classifed as no.
+As seen from the above confusion matrix, 810 were misclassified as a Type 2 error and 734 were type 1 that is it was Popular but classifed as Unpopular.
 
 
 ##Method#2: Adding Regression to trees
@@ -139,7 +142,7 @@ library(rpart)
 
 #reg_data_train <- news_train[c(29:60,62)]
 
-m.rpart <- rpart(Popularity ~ ., data=news_train[c(29:60,62)])
+m.rpart <- rpart(shares ~ ., data=news_train[c(2:61)])
 m.rpart
 
 #install.packages('rpart.plot')
@@ -165,5 +168,5 @@ cor(p.rpart, news_test$shares)
 
 ```
 
-A 54% correlation is seen. 
+A 61% correlation is seen. 
 
