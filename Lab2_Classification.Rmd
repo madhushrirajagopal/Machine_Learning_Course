@@ -1,0 +1,192 @@
+---
+title: "Lab2_Classification"
+output:
+  word_document: default
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##Lab 2 
+
+
+##Method1: Support vector machines
+
+#Step 1: Collecting data 
+
+```{r }
+
+getwd()
+setwd('C:/Users/Madhu/Side Projects/Machine_Learning_Course')
+
+#Read data 
+
+letters <- read.csv("letterdata.csv")
+str(letters)
+
+```
+
+Step 2: Preparing the Data
+
+Next, we explore and prepare data in step 2.
+
+```{r }
+# Creating training and testing data set 
+
+
+letters_train <- letters[1:18000, ]
+letters_test <- letters[18001:20000, ]
+
+
+```
+
+Step 3, training model on data 
+
+
+```{r }
+# Installing  kernlab
+
+#install.packages('kernlab')
+
+
+library(kernlab)
+
+letter_classifier <- ksvm(letter ~ ., data = letters_train, kernel = "vanilladot")
+
+letter_classifier
+
+```
+
+The last and final step 4 of evaluating model performance
+
+```{r }
+
+letter_predictions <- predict(letter_classifier, letters_test)
+
+table(letter_predictions, letters_test$letter)
+
+agreement <- letter_predictions == letters_test$letter
+
+table(agreement)
+
+```
+
+ 
+
+
+#Method 2: Naive Bayes Algorithm  
+
+step 1: collecting data 
+
+```{r }
+
+
+#Read data file
+
+credit <- read.csv('credit.csv')
+
+str(credit)
+
+```
+
+Step 2: Exploring the data
+
+
+```{r }
+#Using sumary to check the statistics of amunt column in the dataset
+
+summary(credit$amount)
+
+str(credit$default)
+
+#Default has two levels - yes or no
+#Using table to see how many were defaulted and how many were not
+
+table(credit$default)
+
+```
+
+
+
+
+Steps to develop tree based classification
+
+
+```{r }
+#Before creating the testing and training data, randomizing the observations
+
+set.seed(12345)
+
+credit_rand <- credit[order(runif(1000)),]
+
+#checking the summary of the original data with the randomized one to notice any substantial changes 
+
+summary(credit$amount)
+summary(credit_rand$amount)
+
+```
+
+
+
+Splitting data to training and testing set 
+
+
+```{r }
+# Choosing 75% for training set and remaining 25% as the testing set
+
+credit_train <- credit_rand[1:750,]
+credit_test <- credit_rand[751:1000,]
+
+#Looking at percentage split of the testing and training to see if randomization went well
+
+prop.table(table(credit_train$default))
+prop.table(table(credit_train$default))
+
+```
+
+
+Training a model on the data
+
+```{r }
+
+#install.packages('naivebayes')
+
+library(naivebayes)
+
+naive <- naive_bayes(default ~ ., data = credit_train)
+
+
+naive
+
+```
+
+
+#step 4: Evaluating Model performance
+
+```{r }
+
+naive_predict <- table(predict(naive, credit_test), credit_test$default)
+naive_predict
+
+```
+
+```{r }
+
+#calculate accuracy of the model 
+
+accuracy <- sum(diag(naive_predict))/sum(naive_predict)*100
+accuracy
+
+```
+
+```{r}
+ prediction <- predict(naive, credit_test)
+ check <- prediction == credit_test$default
+ table(check)
+
+```
+
+As seen, the two evaulation methods match.  
