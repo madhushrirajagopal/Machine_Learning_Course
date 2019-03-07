@@ -1,0 +1,140 @@
+---
+title: "SVM&Naive_Bayes"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+Step 1: collecting data 
+
+```{r }
+getwd()
+setwd('C:/Users/Madhu/Side Projects/Machine_Learning_Course')
+
+#Read data file
+
+news <- read.csv('OnlineNewsPopularity.csv')
+
+str(news)
+
+```
+
+Step 2: Exploring the data
+
+
+```{r }
+#Using sumary to check the statistics of shares column in the dataset
+
+summary(news$shares)
+
+# Adding new variable Popularity based on the market share value. Considering the median value of 1400 to make a splut in the data as popular and unpopular 
+
+news$Popularity <- ifelse( news$shares <= 1400, "Unpopular","Popular")
+
+news$Popularity <- as.factor(news$Popularity)
+
+
+#Using table to see how many were defaulted and how many were not
+
+table(news$Popularity)
+
+```
+
+
+##Method1: Support vector machines
+
+Creating the training and testing data set
+
+```{r }
+# Choosing 75% for training set and remaining 
+
+news_train <- news_rand[1:29733,]
+news_test <- news_rand[29734:39644,]
+
+
+```
+
+ Training model on data 
+
+
+```{r }
+# Installing  kernlab
+
+#install.packages('kernlab')
+
+
+library(kernlab)
+
+news_classifier <- ksvm(Popularity ~ ., data = news_train[c(29:60,62)], kernel = "vanilladot")
+
+news_classifier
+
+```
+
+There us a training error of 40%
+
+The last and final step 4 of evaluating model performance
+
+```{r }
+
+news_predictions <- predict(news_classifier, news_test)
+
+table(news_predictions, news_test$Popularity)
+
+agreement <- news_predictions == news_test$Popularity
+
+table(agreement)
+
+```
+
+ Model has predicted 5942 correctly and 3970 was misclassified. 
+
+
+#Method 2: Naive Bayes Algorithm  
+
+
+Training a model on the data
+
+```{r }
+
+#install.packages('naivebayes')
+
+library(naivebayes)
+
+naive <- naive_bayes(Popularity ~ ., data = news_train[c(29:60,62)])
+
+
+naive
+
+```
+
+
+#step 4: Evaluating Model performance
+
+```{r }
+
+naive_predict <- table(predict(naive, news_test), news_test$Popularity)
+naive_predict
+
+```
+
+```{r }
+
+#calculate accuracy of the model 
+
+accuracy <- sum(diag(naive_predict))/sum(naive_predict)*100
+accuracy
+
+```
+
+```{r}
+ prediction <- predict(naive, news_test)
+ check <- prediction == news_test$Popularity
+ table(check)
+
+```
+
+As seen, the two evaulation methods match.  
