@@ -1,6 +1,8 @@
 ---
 title: "SVM&Naive_Bayes"
-output: html_document
+output:
+  word_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -49,6 +51,12 @@ table(news$Popularity)
 Creating the training and testing data set
 
 ```{r }
+
+set.seed(12345)
+
+news_rand <- news[order(runif(39644)),]
+
+
 # Choosing 75% for training set and remaining 
 
 news_train <- news_rand[1:29733,]
